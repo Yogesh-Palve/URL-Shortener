@@ -3,7 +3,7 @@ const { handleGenerateNewShortUrl, handleRedirect, handleGetAnalytics } = requir
 const router = express.Router()
 
 
-router.post("/url", handleGenerateNewShortUrl)
+router.post("/", handleGenerateNewShortUrl)
 router.get("/:shortId", handleRedirect)
 router.get("/analytics/:shortId", handleGetAnalytics)
 
