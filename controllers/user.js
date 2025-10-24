@@ -20,9 +20,14 @@ const handleUserLogin = async (req,res) => {
     if(!user) return res.render("login" , 
         { error : "Invalid Username or Password"}
     )
-    const sessionId = uuidv4()
-    setUser(sessionId,user)
-    res.cookie("uid",sessionId)
+    // with uuid 
+    // const sessionId = uuidv4()
+    // setUser(sessionId,user)
+    // res.cookie("uid",sessionId)
+    
+    // after jwt - below
+    const token = setUser(user)
+    res.cookie("uid",token)
     return res.redirect("/")
 }
 
