@@ -2,7 +2,7 @@ const express = require("express")
 const path = require("path")
 const connectMongoDb = require("./connection")
 const cookieParser = require("cookie-parser")
-const {restrictToLoggedInUserOnly} = require("./middleware/auth")
+const {checkForAuthentication, } = require("./middleware/auth")
 
 const urlRoute = require("./routes/url")
 const staticRoute = require("./routes/staticRouter")
@@ -23,10 +23,11 @@ app.set("views", path.resolve("./views"))
 app.use(express.json()) 
 app.use(express.urlencoded({ extended : false })) 
 app.use(cookieParser())
+app.use(checkForAuthentication) // everytime it will check for authentication 
 
 // routes 
-app.use("/url", restrictToLoggedInUserOnly, urlRoute)
-app.use("/user",userRoute)
 app.use("/", staticRoute)
+app.use("/url",  urlRoute)
+app.use("/user",userRoute)
 
 app.listen(PORT,() => console.log(`Server started at PORT ${PORT}`)) 

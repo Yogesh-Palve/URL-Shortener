@@ -1,18 +1,57 @@
-const { getUser } = require("../service/auth")
+// const { getUser } = require("../service/auth")
 
-async function restrictToLoggedInUserOnly (req, res, next) {
-    // console.log(req)
-    const userUid = req.cookies?.uid
-    // console.log(userUid)
-    if(!userUid) return res.redirect("/login")
-    const user = getUser(userUid)
+// async function restrictToLoggedInUserOnly (req, res, next) {
+//     // console.log(req)
+//     const userUid = req.cookies?.uid
+//     // console.log(userUid)
+//     if(!userUid) return res.redirect("/login")
+//     const user = getUser(userUid)
 
-    if(!user) return res.redirect("/login")
+//     if(!user) return res.redirect("/login")
     
+//     req.user = user
+//     next()
+// }
+
+// module.exports = {
+//     restrictToLoggedInUserOnly
+// }
+
+
+// refactored code for authorization (using bearer token)
+const {getUser} = require("../service/auth")
+
+function checkForAuthentication (req, res, next) {
+    // console.log(req.headers)
+    // const authorizationHeaderValue = req.headers['authorization']
+    const tokenCookie = req.cookies?.token
+    req.user = null
+
+    // if( !authorizationHeaderValue || 
+    //     !authorizationHeaderValue.startsWith("Bearer")
+    // ) 
+    //     next()  
+    if(!tokenCookie) return next()
+    
+    // const token = authorizationHeaderValue.split("Bearer ")[1]
+    const token = tokenCookie
+    const user = getUser(token)
+
     req.user = user
-    next()
+    return next()
 }
 
+
+function restrictTo(roles = []) {
+    return function (req, res, next) {
+        if(!req.user) return res.redirect("/login")
+        
+        if(!roles.includes(req.user.role)) return res.end("Unauthorized")
+        
+        return next()
+    }
+}
 module.exports = {
-    restrictToLoggedInUserOnly
+    checkForAuthentication,
+    restrictTo,
 }
